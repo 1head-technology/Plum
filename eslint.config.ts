@@ -32,6 +32,16 @@ export default defineConfigWithVueTs(
     files: ['src/**/__tests__/*'],
   },
 
+  {
+    rules: {
+      indent: ['error', 'tab'],
+      'vue/html-indent': ['error', 'tab'],
+      'vue/script-indent': ['error', 'tab'],
+      quotes: ["error", "double"],
+      semi: ["error", "always"],
+    },
+  },
+
   ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
 
   skipFormatting,
