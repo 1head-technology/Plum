@@ -1,0 +1,50 @@
+:root {
+	// ---- surfaces ----
+	--paper: #fafaf8;
+	--paper-warm: #f7f5f0;
+	--ink: #1a1a19;
+
+	// ---- stone scale ----
+	--stone-100: #f0eeea;
+	--stone-200: #e2dfda;
+	--stone-300: #ccc9c2;
+	--stone-400: #a8a49c;
+	--stone-700: #3d3d3a;
+
+	// ---- foreground ----
+	--fg-1: #2c2c2a;
+	--fg-2: #4a4a46;
+	--fg-3: #7a7a74;
+	--fg-4: #a0a098;
+
+	// ---- line ----
+	--line: #e8e6e0;
+
+	// ---- brand — spruce / wise ----
+	--wise: #3a7d6a;
+	--wise-deep: #2a5e4f;
+	--wise-paper: #eaf5f0;
+	--wise-mist: #d4ebe2;
+
+	// ---- semantic ----
+	--gain: #3a7d6a;
+	--gain-soft: #eaf5f0;
+	--loss: #c0503a;
+	--loss-soft: #fceee9;
+	--warn: #c49a2e;
+	--warn-soft: #fdf5e0;
+	--info: #4a8ec2;
+	--info-soft: #e8f2fb;
+
+	// ---- shadows ----
+	--shadow-1: 0 1px 3px rgba(0, 0, 0, 0.04);
+	--shadow-2: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+	// ---- ease ----
+	--ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+	// ---- fonts ----
+	--font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	--font-jp: "Noto Sans JP", "Hiragino Kaku Gothic Pro", sans-serif;
+	--font-mono: "SF Mono", "Fira Code", monospace;
+}
