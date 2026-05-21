@@ -20,14 +20,12 @@
 				:size="14.5"
 				:weight="500"
 				:tone="balance < 0 ? 'loss' : undefined"
-				:currency="account.currency"
-			/>
+				:currency="account.currency" />
 
 			<ChevronDown
 				:size="14"
 				class="drawer-row__chevron"
-				:class="{ 'drawer-row__chevron--open': expanded }"
-			/>
+				:class="{ 'drawer-row__chevron--open': expanded }" />
 		</div>
 
 		<!-- expanded detail -->
@@ -35,16 +33,14 @@
 			<WInput
 				v-model:value="editName as string"
 				label="name"
-				size="sm"
-			/>
+				size="sm" />
 			<WSelect
 				v-model:value="editType as AccountType"
 				label="type"
 				:options="accountTypeOptions"
 				value-key="value"
 				label-key="label"
-				size="sm"
-			/>
+				size="sm" />
 			<WSelect
 				v-model:value="editCurrency as string"
 				label="currency"
@@ -53,8 +49,7 @@
 				label-key="code"
 				description-key="name"
 				size="sm"
-				searchable
-			/>
+				searchable />
 		</div>
 	</div>
 </template>

@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, toRef } from "vue";
 
 const props = withDefaults(
 	defineProps<{
@@ -21,18 +21,25 @@ const props = withDefaults(
 	},
 );
 
+const value = toRef(props, "value");
+const currency = toRef(props, "currency");
+const signed = toRef(props, "signed");
+const tone = toRef(props, "tone");
+const size = toRef(props, "size");
+const weight = toRef(props, "weight");
+
 const currencyFormatter = new Intl.NumberFormat("en-US", {
 	style: "currency",
-	currency: "EUR",
+	currency: currency.value,
 });
 
 // Computed
-const isNeg = computed(() => props.value < 0);
+const isNeg = computed(() => value.value < 0);
 
-const formatted = computed(() => currencyFormatter.format(props.value));
+const formatted = computed(() => currencyFormatter.format(value.value));
 
 const sign = computed(() => {
-	if (props.signed) {
+	if (signed.value) {
 		return isNeg.value ? "− " : "+ ";
 	}
 
@@ -41,10 +48,11 @@ const sign = computed(() => {
 
 const display = computed(() => `${sign.value}${formatted.value}`);
 
-const toneClass = computed(() => (props.tone ? `w-money--${props.tone}` : ""));
+const toneClass = computed(() => (tone.value ? `w-money--${tone.value}` : ""));
+
 const moneyStyle = computed(() => ({
-	fontSize: `${props.size}px`,
-	fontWeight: props.weight,
+	fontSize: `${size.value}px`,
+	fontWeight: weight.value,
 }));
 </script>
 
