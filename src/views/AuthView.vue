@@ -20,55 +20,87 @@
 			</div>
 
 			<WEyebrow style="text-align: center">naru wise</WEyebrow>
-			<h1 class="auth-card__title">{{ mode === 'login' ? 'Welcome back.' : 'Create your account.' }}</h1>
+			<h1 class="auth-card__title">
+				{{ mode === "login" ? "Welcome back." : "Create your account." }}
+			</h1>
 			<p class="auth-card__subtitle">
-				{{ mode === 'login'
-					? 'pick up where you left off — your accounts, budgets, and goals are waiting.'
-					: 'start tracking your finances — set up accounts, budgets, and goals.'
+				{{
+					mode === "login"
+						? "pick up where you left off — your accounts, budgets, and goals are waiting."
+						: "start tracking your finances — set up accounts, budgets, and goals."
 				}}
 			</p>
 
 			<!-- Tab switcher -->
 			<div class="auth-tabs">
-				<button class="auth-tab" :class="{ 'auth-tab--active': mode === 'login' }" @click="switchMode('login')">sign in</button>
-				<button class="auth-tab" :class="{ 'auth-tab--active': mode === 'signup' }" @click="switchMode('signup')">create account</button>
+				<button
+					class="auth-tab"
+					:class="{ 'auth-tab--active': mode === 'login' }"
+					@click="switchMode('login')"
+				>
+					sign in
+				</button>
+				<button
+					class="auth-tab"
+					:class="{ 'auth-tab--active': mode === 'signup' }"
+					@click="switchMode('signup')"
+				>
+					create account
+				</button>
 			</div>
 
 			<form @submit.prevent="handleSubmit" class="auth-form">
 				<!-- Name (signup only) -->
-				<div v-if="mode === 'signup'" class="auth-field">
-					<WEyebrow>name</WEyebrow>
-					<div class="auth-input-wrap">
-						<input v-model="form.name" type="text" placeholder="your name" required class="auth-input" />
-					</div>
-				</div>
+				<WInput
+					v-if="mode === 'signup'"
+					v-model:value="form.name"
+					label="name"
+					placeholder="your name"
+					size="lg"
+					required
+				/>
 
 				<!-- Email -->
-				<div class="auth-field">
-					<WEyebrow>email</WEyebrow>
-					<div class="auth-input-wrap">
-						<input v-model="form.email" type="email" placeholder="you@somewhere.com" required class="auth-input" />
-					</div>
-				</div>
+				<WInput
+					v-model:value="form.email"
+					type="email"
+					label="email"
+					placeholder="you@somewhere.com"
+					size="lg"
+					required
+				/>
 
 				<!-- Password -->
 				<div class="auth-field">
 					<div class="auth-field__header">
 						<WEyebrow>password</WEyebrow>
-						<button v-if="mode === 'login'" type="button" class="auth-link auth-link--small" @click.prevent>forgot?</button>
+						<button
+							v-if="mode === 'login'"
+							type="button"
+							class="auth-link auth-link--small"
+							@click.prevent
+						>
+							forgot?
+						</button>
 					</div>
-					<div class="auth-input-wrap">
-						<input v-model="form.password" type="password" placeholder="••••••••" required class="auth-input" />
-					</div>
+					<WInput
+						v-model:value="form.password"
+						type="password"
+						placeholder="••••••••"
+						size="lg"
+						required
+					/>
 				</div>
 
 				<!-- Currency (signup only) -->
-				<div v-if="mode === 'signup'" class="auth-field">
-					<WEyebrow>default currency</WEyebrow>
-					<div class="auth-input-wrap">
-						<input v-model="form.defaultCurrency" type="text" placeholder="EUR" required class="auth-input" />
-					</div>
-				</div>
+				<WInput
+					v-if="mode === 'signup'"
+					v-model:value="form.defaultCurrency"
+					label="default currency"
+					placeholder="EUR"
+					size="lg"
+					required
+				/>
 
 				<!-- Keep signed in (login only) -->
 				<label v-if="mode === 'login'" class="auth-checkbox">
@@ -78,7 +110,13 @@
 
 				<!-- Submit -->
 				<button type="submit" class="auth-submit" :disabled="session.loading">
-					{{ session.loading ? 'Please wait...' : (mode === 'login' ? 'Sign in' : 'Create account') }}
+					{{
+						session.loading
+							? "Please wait..."
+							: mode === "login"
+								? "Sign in"
+								: "Create account"
+					}}
 				</button>
 
 				<p v-if="session.error" class="auth-error">{{ session.error }}</p>
@@ -104,10 +142,14 @@
 			<!-- Bottom link -->
 			<p class="auth-card__footer">
 				<template v-if="mode === 'login'">
-					new to wise? <button class="auth-link" @click="switchMode('signup')">create an account</button>
+					new to wise?
+					<button class="auth-link" @click="switchMode('signup')">
+						create an account
+					</button>
 				</template>
 				<template v-else>
-					already have an account? <button class="auth-link" @click="switchMode('login')">sign in</button>
+					already have an account?
+					<button class="auth-link" @click="switchMode('login')">sign in</button>
 				</template>
 			</p>
 		</main>
@@ -118,7 +160,7 @@
 import { reactive, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useSessionStore } from "@/stores/session";
-import { NaruMark, WEyebrow, AvatarMark } from "@/components/ui";
+import { NaruMark, WEyebrow, WInput, AvatarMark } from "@/components/ui";
 import { KeyRound } from "lucide-vue-next";
 
 const router = useRouter();
@@ -152,7 +194,7 @@ async function handleSubmit() {
 			defaultCurrency: form.defaultCurrency,
 		});
 	}
-	router.push("/");
+	await router.push("/");
 }
 </script>
 
@@ -176,9 +218,21 @@ async function handleSubmit() {
 	align-items: baseline;
 	gap: 8px;
 }
-.auth-topbar__name { font-size: 14px; color: var(--fg-1); font-weight: 500; }
-.auth-topbar__sub { font-size: 11px; color: var(--fg-4); letter-spacing: 0.18em; text-transform: lowercase; }
-.auth-topbar__help { font-size: 13px; color: var(--fg-3); }
+.auth-topbar__name {
+	font-size: 14px;
+	color: var(--fg-1);
+	font-weight: 500;
+}
+.auth-topbar__sub {
+	font-size: 11px;
+	color: var(--fg-4);
+	letter-spacing: 0.18em;
+	text-transform: lowercase;
+}
+.auth-topbar__help {
+	font-size: 13px;
+	color: var(--fg-3);
+}
 
 /* ---- Card ---- */
 .auth-card {
@@ -256,29 +310,6 @@ async function handleSubmit() {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-}
-.auth-input-wrap {
-	background: var(--paper);
-	border: 1px solid var(--line);
-	border-radius: 8px;
-	transition: border-color 120ms var(--ease-out), box-shadow 120ms var(--ease-out);
-}
-.auth-input-wrap:focus-within {
-	border-color: var(--wise);
-	box-shadow: 0 0 0 3px var(--wise-mist);
-}
-.auth-input {
-	width: 100%;
-	border: none;
-	outline: none;
-	background: transparent;
-	padding: 14px 16px;
-	font-size: 15px;
-	font-family: var(--font-sans);
-	color: var(--ink);
-}
-.auth-input::placeholder {
-	color: var(--fg-4);
 }
 
 /* ---- Checkbox ---- */

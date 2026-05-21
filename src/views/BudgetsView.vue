@@ -38,7 +38,7 @@
 					<template #action><WButton variant="ghost" icon="plus" size="sm">New budget</WButton></template>
 				</SectionHeader>
 				<div class="budgets__grid">
-					<BudgetRow v-for="b in budgetLines" :key="b.cat" :b="b" />
+					<BudgetRow v-for="line in budgetLines" :key="line.categoryId" :line="line" />
 				</div>
 			</WCard>
 
@@ -52,9 +52,8 @@
 <script setup lang="ts">
 import { computed, watch } from "vue";
 import { WCard, WEyebrow, WMoney, WBadge, WButton, WDonut, SectionHeader } from "@/components/ui";
-import BudgetRow from "@/components/BudgetRow.vue";
+import BudgetRow from "@/components/budgets/BudgetRow.vue";
 import { useBudgetsStore } from "@/stores/budgets";
-import { toDisplayBudgetLine } from "@/data/fixtures";
 
 const budgetsStore = useBudgetsStore();
 
@@ -70,15 +69,19 @@ watch(
 	{ immediate: true },
 );
 
-const budgetLines = computed(() => {
-	const allLines = Object.values(budgetsStore.summaries).flatMap((s) => s.lines);
-	return allLines.map(toDisplayBudgetLine);
-});
+const budgetLines = computed(() =>
+	Object.values(budgetsStore.summaries).flatMap((s) => s.lines),
+);
 
-const totalSpent = computed(() => budgetLines.value.reduce((s, b) => s + b.spent, 0));
-const totalCap = computed(() => budgetLines.value.reduce((s, b) => s + b.cap, 0));
+const totalSpent = computed(() => budgetLines.value.reduce((s, l) => s + l.spent, 0));
+const totalCap = computed(() => budgetLines.value.reduce((s, l) => s + l.planned, 0));
 const pct = computed(() => (totalCap.value > 0 ? (totalSpent.value / totalCap.value) * 100 : 0));
-const nearCapCount = computed(() => budgetLines.value.filter((b) => b.tone === "warn" || b.tone === "loss").length);
+const nearCapCount = computed(() =>
+	budgetLines.value.filter((l) => {
+		const ratio = l.planned > 0 ? l.spent / l.planned : 0;
+		return ratio > 0.8;
+	}).length,
+);
 </script>
 
 <style scoped>

@@ -1,8 +1,8 @@
 <template>
 	<div class="donut" :style="{ width: `${size}px`, height: `${size}px` }">
 		<svg :width="size" :height="size" style="transform: rotate(-90deg)">
-			<circle :cx="size / 2" :cy="size / 2" :r="r" stroke="var(--stone-100)" :stroke-width="stroke" fill="none" />
-			<circle :cx="size / 2" :cy="size / 2" :r="r" stroke="var(--wise)" :stroke-width="stroke" fill="none"
+			<circle v-if="size" :cx="size / 2" :cy="size / 2" :r="r" stroke="var(--stone-100)" :stroke-width="stroke" fill="none" />
+			<circle v-if="size" :cx="size / 2" :cy="size / 2" :r="r" stroke="var(--wise)" :stroke-width="stroke" fill="none"
 				:stroke-dasharray="c" :stroke-dashoffset="offset" stroke-linecap="round"
 				style="transition: stroke-dashoffset 420ms var(--ease-out)" />
 		</svg>

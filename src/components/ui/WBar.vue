@@ -7,21 +7,28 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-const props = withDefaults(defineProps<{
-	value: number;
-	max?: number;
-	tone?: "accent" | "warn" | "loss";
-	height?: number;
-}>(), {
-	max: 100,
-	tone: "accent",
-	height: 6,
-});
+const props = withDefaults(
+	defineProps<{
+		value: number;
+		max?: number;
+		tone?: "accent" | "warn" | "loss";
+		height?: number;
+	}>(),
+	{
+		max: 100,
+		tone: "accent",
+		height: 6,
+	},
+);
 
 const pct = computed(() => Math.min(100, (props.value / props.max) * 100));
 const color = computed(() => {
-	if (props.tone === "warn") return "var(--warn)";
-	if (props.tone === "loss") return "var(--loss)";
+	if (props.tone === "warn") {
+		return "var(--warn)";
+	}
+	if (props.tone === "loss") {
+		return "var(--loss)";
+	}
 	return "var(--wise)";
 });
 const fillStyle = computed(() => ({

@@ -5,8 +5,7 @@
 				v-if="isOpen"
 				class="modal-backdrop"
 				:class="`modal-backdrop--${position}`"
-				@click="onBackdrop"
-			>
+				@click="onBackdrop">
 				<div
 					ref="dialogRef"
 					class="modal"
@@ -15,8 +14,7 @@
 					aria-modal="true"
 					:aria-label="title"
 					tabindex="-1"
-					@click.stop
-				>
+					@click.stop>
 					<header v-if="title || $slots.header || showClose" class="modal__header">
 						<slot name="header">
 							<h2 v-if="title" class="modal__title">{{ title }}</h2>
@@ -25,8 +23,7 @@
 							v-if="showClose"
 							class="modal__close"
 							aria-label="Close"
-							@click="close"
-						>
+							@click="close">
 							<X :size="18" />
 						</button>
 					</header>
@@ -93,23 +90,30 @@ function onKeydown(e: KeyboardEvent) {
 	}
 }
 
-watch(
-	() => props.isOpen,
-	(open) => {
-		if (open) {
-			document.addEventListener("keydown", onKeydown);
-			if (props.lockScroll) document.body.style.overflow = "hidden";
-			requestAnimationFrame(() => dialogRef.value?.focus());
-		} else {
-			document.removeEventListener("keydown", onKeydown);
-			if (props.lockScroll) document.body.style.overflow = "";
+watch(() => props.isOpen, (open) => {
+	if (open) {
+		document.addEventListener("keydown", onKeydown);
+
+		if (props.lockScroll) {
+			document.body.style.overflow = "hidden";
 		}
-	},
-);
+		requestAnimationFrame(() => dialogRef.value?.focus());
+	}
+	else {
+		document.removeEventListener("keydown", onKeydown);
+
+		if (props.lockScroll) {
+			document.body.style.overflow = "";
+		}
+	}
+});
 
 onBeforeUnmount(() => {
 	document.removeEventListener("keydown", onKeydown);
-	if (props.lockScroll) document.body.style.overflow = "";
+
+	if (props.lockScroll) {
+		document.body.style.overflow = "";
+	}
 });
 </script>
 

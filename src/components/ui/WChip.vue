@@ -1,7 +1,10 @@
 <template>
-	<button class="w-chip" :class="{ 'w-chip--active': active }" @click="$emit('click', $event)">
+	<button
+		class="w-chip"
+		:class="{ 'w-chip--active': active }"
+		@click="$emit('click', $event)">
 		<slot />
-		<span v-if="count != null" class="w-chip__count">· {{ count }}</span>
+		<span v-if="count" class="w-chip__count">· {{ count }}</span>
 	</button>
 </template>
 

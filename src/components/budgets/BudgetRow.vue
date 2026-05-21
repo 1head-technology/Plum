@@ -1,15 +1,15 @@
 <template>
 	<div class="budget-row">
 		<div class="budget-row__header">
-			<div class="budget-row__cat">{{ b.cat }}</div>
+			<div class="budget-row__cat">{{ line.categoryName }}</div>
 			<div class="budget-row__amounts" :class="{ 'budget-row__amounts--over': over }">
-				${{ b.spent }} / ${{ b.cap }}
+				${{ line.spent }} / ${{ line.planned }}
 			</div>
 		</div>
-		<div style="margin-top: 10px"><WBar :value="b.spent" :max="b.cap" :tone="b.tone" /></div>
+		<div style="margin-top: 10px"><WBar :value="line.spent" :max="line.planned" :tone="tone" /></div>
 		<div class="budget-row__footer">
 			<span>{{ Math.round(pct) }}% spent</span>
-			<span>{{ over ? `over by $${b.spent - b.cap}` : `$${b.cap - b.spent} left` }}</span>
+			<span>{{ over ? `over by $${line.spent - line.planned}` : `$${line.planned - line.spent} left` }}</span>
 		</div>
 	</div>
 </template>
@@ -17,12 +17,16 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { WBar } from "@/components/ui";
-import type { DisplayBudget } from "@/data/fixtures";
+import type { BudgetLineSummary } from "@/api";
 
-const props = defineProps<{ b: DisplayBudget }>();
+const props = defineProps<{ line: BudgetLineSummary }>();
 
-const pct = computed(() => Math.min(100, (props.b.spent / props.b.cap) * 100));
-const over = computed(() => props.b.spent > props.b.cap);
+const pct = computed(() => props.line.planned > 0 ? Math.min(100, (props.line.spent / props.line.planned) * 100) : 0);
+const over = computed(() => props.line.spent > props.line.planned);
+const tone = computed(() => {
+	const ratio = props.line.planned > 0 ? props.line.spent / props.line.planned : 0;
+	return ratio > 1 ? "loss" : ratio > 0.8 ? "warn" : "accent";
+});
 </script>
 
 <style scoped>

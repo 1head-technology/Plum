@@ -30,9 +30,11 @@ export const useAccountsStore = defineStore("accounts", () => {
 		try {
 			accounts.value = await accountsApi.list();
 			await Promise.all(accounts.value.map((a) => refreshBalance(a.id)));
-		} catch (err) {
+		}
+		catch (err) {
 			error.value = err instanceof Error ? err.message : "Failed to load accounts";
-		} finally {
+		}
+		finally {
 			loading.value = false;
 		}
 	}
@@ -44,8 +46,10 @@ export const useAccountsStore = defineStore("accounts", () => {
 
 	async function create(payload: CreateAccountRequest): Promise<Account> {
 		const created = await accountsApi.create(payload);
+
 		accounts.value = [...accounts.value, created];
 		await refreshBalance(created.id);
+
 		return created;
 	}
 

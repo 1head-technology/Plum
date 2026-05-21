@@ -4,23 +4,23 @@
 		<p v-if="savingsStore.error" class="error">{{ savingsStore.error }}</p>
 
 		<template v-if="!savingsStore.loading">
-			<div class="goals__grid" v-if="displayGoals.length">
-				<WCard v-for="g in displayGoals" :key="g.id" :padding="22">
+			<div class="goals__grid" v-if="savingsStore.goals.length">
+				<WCard v-for="g in savingsStore.goals" :key="g.id" :padding="22">
 					<div class="goal-card__top">
 						<div>
 							<div class="goal-card__name">{{ g.name }}</div>
-							<div class="goal-card__tag">{{ g.tag }}</div>
+							<div class="goal-card__tag">{{ goalTag(g) }}</div>
 						</div>
-						<AvatarMark :size="36" char="る" tone="accent" />
+						<AvatarMark :size="36" />
 					</div>
 					<div class="goal-card__amount">
-						<WMoney :value="g.saved" :size="28" :weight="500" />
-						<span class="goal-card__target">/ ${{ g.target.toLocaleString() }}</span>
+						<WMoney :value="g.currentAmount" :size="28" :weight="500" />
+						<span class="goal-card__target">/ ${{ g.targetAmount.toLocaleString() }}</span>
 					</div>
-					<div style="margin-top: 14px"><WBar :value="g.saved" :max="g.target" :tone="g.tone" /></div>
+					<div style="margin-top: 14px"><WBar :value="g.currentAmount" :max="g.targetAmount" :tone="goalTone(g)" /></div>
 					<div class="goal-card__footer">
-						<span>{{ Math.round((g.saved / g.target) * 100) }}% saved</span>
-						<span style="font-variant-numeric: tabular-nums">${{ (g.target - g.saved).toLocaleString() }} to go</span>
+						<span>{{ Math.round((g.currentAmount / g.targetAmount) * 100) }}% saved</span>
+						<span style="font-variant-numeric: tabular-nums">${{ (g.targetAmount - g.currentAmount).toLocaleString() }} to go</span>
 					</div>
 				</WCard>
 			</div>
@@ -37,16 +37,25 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
 import { WCard, WEyebrow, WMoney, WBar, WButton, AvatarMark } from "@/components/ui";
 import { useSavingsGoalsStore } from "@/stores/savingsGoals";
-import { toDisplayGoal } from "@/data/fixtures";
+import type { SavingsGoal } from "@/api";
 
 const savingsStore = useSavingsGoalsStore();
 
-const displayGoals = computed(() =>
-	savingsStore.goals.map(toDisplayGoal),
-);
+function goalTag(g: SavingsGoal): string {
+	if (g.deadline) {
+		const d = new Date(g.deadline);
+		return d.toLocaleString("en-US", { month: "short", year: "numeric" }).toLowerCase();
+	}
+	const pct = g.targetAmount > 0 ? g.currentAmount / g.targetAmount : 0;
+	return pct >= 0.9 ? "almost there" : `${Math.round(pct * 100)}% saved`;
+}
+
+function goalTone(g: SavingsGoal): "accent" | "warn" {
+	const pct = g.targetAmount > 0 ? g.currentAmount / g.targetAmount : 0;
+	return pct > 0.8 ? "warn" : "accent";
+}
 </script>
 
 <style scoped>

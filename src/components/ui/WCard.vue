@@ -1,5 +1,8 @@
 <template>
-	<div class="w-card" :class="[`w-card--${tone}`, { 'w-card--hoverable': hoverable }]" :style="{ padding: `${padding}px` }">
+	<div
+		class="w-card"
+		:class="[`w-card--${tone}`, { 'w-card--hoverable': hoverable }]"
+		:style="{ padding: `${padding}px` }">
 		<slot />
 	</div>
 </template>

@@ -44,10 +44,15 @@ export const useSessionStore = defineStore("session", () => {
 		error.value = null;
 
 		try {
-			const { user: logged, token } = await authApi.login(payload);
-			user.value = logged;
+			const {
+				user: loggedUser,
+				token
+			} = await authApi.login(payload);
+
+			user.value = loggedUser;
+
 			localStorage.setItem(TOKEN_STORAGE_KEY, token);
-			localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(logged));
+			localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(loggedUser));
 		}
 		catch (err) {
 			error.value = err instanceof Error ? err.message : "Login failed";

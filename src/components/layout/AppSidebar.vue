@@ -3,13 +3,15 @@
 		<!-- brand -->
 		<div class="sidebar__brand">
 			<NaruMark :size="28" char="な" color="var(--wise)" />
-			<span class="sidebar__brand-name">naru</span>
+			<span class="sidebar__brand-name">Naru</span>
 			<span class="sidebar__brand-sub">wise</span>
 		</div>
 
-		<div class="sidebar__group-label"><WEyebrow>main</WEyebrow></div>
+		<div class="sidebar__group-label">
+			<WEyebrow>main</WEyebrow>
+		</div>
 		<button
-			v-for="item in mainItems"
+			v-for="item in mainMenuItems"
 			:key="item.id"
 			class="nav-item"
 			:class="{ 'nav-item--active': route === item.id }"
@@ -23,7 +25,7 @@
 			<WEyebrow>more</WEyebrow>
 		</div>
 		<button
-			v-for="item in subItems"
+			v-for="item in mainMenuSubItems"
 			:key="item.id"
 			class="nav-item"
 			:class="{ 'nav-item--active': route === item.id }"
@@ -47,17 +49,16 @@
 
 		<PopoverMenu
 			:open="menuOpen"
-			:items="menuItems"
-			:anchor-bottom="menuAnchorBottom"
-			:anchor-left="14"
+			:items="popoverMenuItems"
+			:anchor="userCardRef"
 			@close="menuOpen = false"
-			@select="handleMenuSelect"
+			@select="onPopoverMenuItemSelect"
 		/>
 	</aside>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, toRef } from "vue";
 import {
 	LayoutGrid,
 	Wallet,
@@ -71,8 +72,10 @@ import {
 	LogOut,
 } from "lucide-vue-next";
 import { NaruMark, WEyebrow, AvatarMark } from "@/components/ui";
-import PopoverMenu, { type MenuItem } from "./PopoverMenu.vue";
+import { type MenuItem } from "@/data/types.ts";
+import PopoverMenu from "./PopoverMenu.vue";
 
+// Props
 const props = defineProps<{
 	route: string;
 	userName?: string;
@@ -80,32 +83,32 @@ const props = defineProps<{
 	userEmail?: string;
 }>();
 
+// Emits
 const emit = defineEmits<{
 	navigate: [id: string];
 	logout: [];
 }>();
 
+// State
+const route = toRef(props, "route");
+const userName = toRef(props, "userName");
+const userRole = toRef(props, "userRole");
+
 const menuOpen = ref(false);
 const userCardRef = ref<HTMLElement | null>(null);
 
-const menuAnchorBottom = computed(() => {
-	if (!userCardRef.value) {
-		return 80;
-	}
-	const rect = userCardRef.value.getBoundingClientRect();
-	return window.innerHeight - rect.top + 8;
-});
 
-function handleMenuSelect(id: string) {
+// Functions
+function onPopoverMenuItemSelect(id: string) {
 	if (id === "logout") {
 		emit("logout");
-	}
-	else if (id === "settings" || id === "help" || id === "account") {
+	} else {
 		emit("navigate", id);
 	}
 }
 
-const mainItems = [
+// Constants
+const mainMenuItems: MenuItem[] = [
 	{ id: "dashboard", label: "Dashboard", icon: LayoutGrid },
 	{ id: "accounts", label: "Accounts", icon: Wallet },
 	{ id: "transactions", label: "Transactions", icon: ArrowLeftRight },
@@ -113,12 +116,12 @@ const mainItems = [
 	{ id: "goals", label: "Goals", icon: Target },
 ];
 
-const subItems = [
+const mainMenuSubItems: MenuItem[] = [
 	{ id: "settings", label: "Settings", icon: Settings },
 	{ id: "help", label: "Help", icon: LifeBuoy },
 ];
 
-const menuItems: MenuItem[] = [
+const popoverMenuItems: MenuItem[] = [
 	{ id: "account", label: "Account", icon: User },
 	{ id: "settings", label: "Settings", icon: Settings, shortcut: "⌘," },
 	{ id: "help", label: "Help", icon: LifeBuoy },

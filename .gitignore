@@ -41,6 +41,9 @@ __screenshots__/
 test-results/
 playwright-report/
 
+# AI
+.claude
+
 # Env
 .env
 .env.production

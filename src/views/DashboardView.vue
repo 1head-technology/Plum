@@ -5,21 +5,44 @@
 			<WCard :padding="24">
 				<WEyebrow>net worth</WEyebrow>
 				<div class="dash__net-row">
-					<WMoney :value="netWorth" :size="44" :weight="500" />
+					<WMoney
+						:currency="userDefaultCurrency"
+						:value="netWorth"
+						:size="44"
+						:weight="500"
+					/>
 					<WBadge tone="gain" dot>↑ this month</WBadge>
 				</div>
 				<div class="dash__subs">
 					<div class="sub">
 						<div class="sub__label">assets</div>
-						<WMoney :value="totals.assets" :size="15" :weight="500" tone="mute" />
+						<WMoney
+							:currency="userDefaultCurrency"
+							:value="totals.assets"
+							:size="15"
+							:weight="500"
+							tone="mute"
+						/>
 					</div>
 					<div class="sub">
 						<div class="sub__label">liabilities</div>
-						<WMoney :value="totals.liabilities" :size="15" :weight="500" tone="mute" />
+						<WMoney
+							:currency="userDefaultCurrency"
+							:value="totals.liabilities"
+							:size="15"
+							:weight="500"
+							tone="mute"
+						/>
 					</div>
 					<div class="sub">
 						<div class="sub__label">cash on hand</div>
-						<WMoney :value="cashOnHand" :size="15" :weight="500" tone="mute" />
+						<WMoney
+							:currency="userDefaultCurrency"
+							:value="cashOnHand"
+							:size="15"
+							:weight="500"
+							tone="mute"
+						/>
 					</div>
 				</div>
 				<div style="margin-top: 22px">
@@ -31,7 +54,13 @@
 				<div>
 					<WEyebrow color="rgba(247,245,240,0.5)">this month · spending</WEyebrow>
 					<div style="margin-top: 12px">
-						<WMoney :value="-spent" :size="36" :weight="500" style="color: var(--paper-warm)" />
+						<WMoney
+							:currency="userDefaultCurrency"
+							:value="-spent"
+							:size="36"
+							:weight="500"
+							style="color: var(--paper-warm)"
+						/>
 					</div>
 					<div class="dash__spending-under">spending this month</div>
 				</div>
@@ -39,7 +68,9 @@
 					<WBar :value="spent" :max="cap || 1" tone="accent" />
 					<div class="dash__spending-footer">
 						<span>{{ spentPct }}% of budget</span>
-						<span style="font-variant-numeric: tabular-nums">${{ cap.toLocaleString() }} cap</span>
+						<span style="font-variant-numeric: tabular-nums">
+							{{ userDefaultCurrency }} {{ cap.toLocaleString() }} cap
+						</span>
 					</div>
 				</div>
 			</WCard>
@@ -56,11 +87,18 @@
 			<WCard :padding="20">
 				<SectionHeader eyebrow="accounts" title="Your money">
 					<template #action>
-						<WButton variant="text" @click="$emit('navigate', 'accounts')">see all →</WButton>
+						<WButton variant="text" @click="$emit('navigate', 'accounts')">
+							see all →
+						</WButton>
 					</template>
 				</SectionHeader>
 				<div class="dash__account-list">
-					<AccountRow v-for="a in displayAccounts.slice(0, 4)" :key="a.id" :acct="a" />
+					<AccountRow
+						v-for="a in accountsStore.accounts.slice(0, 4)"
+						:key="a.id"
+						:account="a"
+						:balance="accountsStore.balances[a.id]?.balance ?? a.initialBalance"
+					/>
 				</div>
 			</WCard>
 
@@ -71,13 +109,16 @@
 					</template>
 				</SectionHeader>
 				<div class="dash__goals-list">
-					<div v-for="g in displayGoals.slice(0, 3)" :key="g.id">
+					<div v-for="goal in savingsStore.goals.slice(0, 3)" :key="goal.id">
 						<div class="dash__goal-header">
-							<span class="dash__goal-name">{{ g.name }}</span>
-							<span class="dash__goal-amounts">${{ g.saved.toLocaleString() }} / ${{ g.target.toLocaleString() }}</span>
+							<span class="dash__goal-name">{{ goal.name }}</span>
+							<span class="dash__goal-amounts">
+								{{ userDefaultCurrency }} {{ goal.currentAmount.toLocaleString() }} /
+								{{ userDefaultCurrency }} {{ goal.targetAmount.toLocaleString() }}
+							</span>
 						</div>
-						<WBar :value="g.saved" :max="g.target" :tone="g.tone" />
-						<div class="dash__goal-tag">{{ g.tag }}</div>
+						<WBar :value="goal.currentAmount" :max="goal.targetAmount" :tone="goalTone(goal)" />
+						<div class="dash__goal-tag">{{ goalTag(goal) }}</div>
 					</div>
 				</div>
 			</WCard>
@@ -87,11 +128,18 @@
 		<WCard :padding="20">
 			<SectionHeader eyebrow="recent activity" title="Transactions">
 				<template #action>
-					<WButton variant="text" @click="$emit('navigate', 'transactions')">see all →</WButton>
+					<WButton variant="text" @click="$emit('navigate', 'transactions')">
+						see all →
+					</WButton>
 				</template>
 			</SectionHeader>
 			<div>
-				<TransactionRow v-for="tx in displayTransactions.slice(0, 6)" :key="tx.id" :tx="tx" />
+				<TransactionRow
+					v-for="tx in transactionsStore.ordered.slice(0, 6)"
+					:key="tx.id"
+					:category-name="tx.categoryId ? categoriesStore.byId.get(tx.categoryId)?.name : null"
+					:tx="tx"
+				/>
 			</div>
 		</WCard>
 	</div>
@@ -99,50 +147,63 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { WCard, WEyebrow, WBadge, WMoney, WBar, WButton, SectionHeader, WModal } from "@/components/ui";
-import AccountRow from "@/components/AccountRow.vue";
-import TransactionRow from "@/components/TransactionRow.vue";
+import { WCard, WEyebrow, WBadge, WMoney, WBar, WButton, SectionHeader } from "@/components/ui";
+import AccountRow from "@/components/accounts/AccountRow.vue";
+import TransactionRow from "@/components/transactions/TransactionRow.vue";
 import MiniSparkline from "@/components/MiniSparkline.vue";
+import { useSessionStore } from "@/stores/session.ts";
 import { useAccountsStore } from "@/stores/accounts";
 import { useTransactionsStore } from "@/stores/transactions";
 import { useCategoriesStore } from "@/stores/categories";
 import { useBudgetsStore } from "@/stores/budgets";
 import { useSavingsGoalsStore } from "@/stores/savingsGoals";
-import { toDisplayAccount, toDisplayTransaction, toDisplayBudgetLine, toDisplayGoal } from "@/data/fixtures";
+import type { AccountType, SavingsGoal } from "@/api";
 
 defineEmits<{ navigate: [id: string] }>();
 
+const loggedUserStore = useSessionStore();
 const accountsStore = useAccountsStore();
 const transactionsStore = useTransactionsStore();
 const categoriesStore = useCategoriesStore();
 const budgetsStore = useBudgetsStore();
 const savingsStore = useSavingsGoalsStore();
 
-const displayAccounts = computed(() =>
-	accountsStore.accounts.map((a) => toDisplayAccount(a, accountsStore.balances[a.id] ?? null)),
+const userDefaultCurrency = computed(() => loggedUserStore?.user?.defaultCurrency);
+
+const creditTypes: AccountType[] = ["CREDIT_CARD"];
+const investTypes: AccountType[] = ["INVESTMENT"];
+
+function balanceOf(accountId: string): number {
+	return accountsStore.balances[accountId]?.balance ?? 0;
+}
+
+const budgetLines = computed(() =>
+	Object.values(budgetsStore.summaries).flatMap((s) => s.lines),
 );
 
-const displayTransactions = computed(() =>
-	transactionsStore.ordered.map((tx) => {
-		const catName = tx.categoryId ? categoriesStore.byId.get(tx.categoryId)?.name ?? null : null;
-		return toDisplayTransaction(tx, catName);
-	}),
-);
+function goalTag(g: SavingsGoal): string {
+	if (g.deadline) {
+		const d = new Date(g.deadline);
+		return d.toLocaleString("en-US", { month: "short", year: "numeric" }).toLowerCase();
+	}
+	const pct = g.targetAmount > 0 ? g.currentAmount / g.targetAmount : 0;
+	return pct >= 0.9 ? "almost there" : `${Math.round(pct * 100)}% saved`;
+}
 
-const displayGoals = computed(() =>
-	savingsStore.goals.map(toDisplayGoal),
-);
-
-const budgetLines = computed(() => {
-	const allLines = Object.values(budgetsStore.summaries).flatMap((s) => s.lines);
-	return allLines.map(toDisplayBudgetLine);
-});
+function goalTone(g: SavingsGoal): "accent" | "warn" {
+	const pct = g.targetAmount > 0 ? g.currentAmount / g.targetAmount : 0;
+	return pct > 0.8 ? "warn" : "accent";
+}
 
 const totals = computed(() => {
-	return displayAccounts.value.reduce(
+	return accountsStore.accounts.reduce(
 		(acc, a) => {
-			if (a.type === "credit") acc.liabilities += a.balance;
-			else acc.assets += a.balance;
+			const bal = balanceOf(a.id) || a.initialBalance;
+			if (creditTypes.includes(a.type)) {
+				acc.liabilities += bal;
+			} else {
+				acc.assets += bal;
+			}
 			return acc;
 		},
 		{ assets: 0, liabilities: 0 },
@@ -150,13 +211,13 @@ const totals = computed(() => {
 });
 const netWorth = computed(() => totals.value.assets + totals.value.liabilities);
 const cashOnHand = computed(() =>
-	displayAccounts.value
-		.filter((a) => a.type !== "invest" && a.type !== "credit")
-		.reduce((s, a) => s + a.balance, 0),
+	accountsStore.accounts
+		.filter((a) => !investTypes.includes(a.type) && !creditTypes.includes(a.type))
+		.reduce((s, a) => s + (balanceOf(a.id) || a.initialBalance), 0),
 );
 
-const spent = computed(() => budgetLines.value.reduce((s, b) => s + b.spent, 0));
-const cap = computed(() => budgetLines.value.reduce((s, b) => s + b.cap, 0));
+const spent = computed(() => budgetLines.value.reduce((s, l) => s + l.spent, 0));
+const cap = computed(() => budgetLines.value.reduce((s, l) => s + l.planned, 0));
 const spentPct = computed(() => (cap.value > 0 ? Math.round((spent.value / cap.value) * 100) : 0));
 </script>
 

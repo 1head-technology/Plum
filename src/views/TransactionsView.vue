@@ -6,7 +6,7 @@
 		<template v-if="!transactionsStore.loading">
 			<!-- Filter chips -->
 			<div class="txns__filters">
-				<WChip :active="filter === 'all'" @click="filter = 'all'" :count="displayTransactions.length">All</WChip>
+				<WChip :active="filter === 'all'" @click="filter = 'all'" :count="transactionsStore.ordered.length">All</WChip>
 				<WChip :active="filter === 'income'" @click="filter = 'income'" :count="incomeCount">Income</WChip>
 				<WChip :active="filter === 'expense'" @click="filter = 'expense'" :count="expenseCount">Expenses</WChip>
 			</div>
@@ -42,7 +42,12 @@
 			<WCard :padding="20">
 				<SectionHeader eyebrow="activity" title="All transactions" />
 				<div>
-					<TransactionRow v-for="tx in filtered" :key="tx.id" :tx="tx" />
+					<TransactionRow
+					v-for="tx in filtered"
+					:key="tx.id"
+					:tx="tx"
+					:category-name="tx.categoryId ? categoriesStore.byId.get(tx.categoryId)?.name : null"
+				/>
 				</div>
 			</WCard>
 		</template>
@@ -52,33 +57,32 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { WCard, WEyebrow, WMoney, WChip, SectionHeader } from "@/components/ui";
-import TransactionRow from "@/components/TransactionRow.vue";
+import TransactionRow from "@/components/transactions/TransactionRow.vue";
 import { useTransactionsStore } from "@/stores/transactions";
 import { useCategoriesStore } from "@/stores/categories";
-import { toDisplayTransaction } from "@/data/fixtures";
+import type { Transaction } from "@/api";
 
 const transactionsStore = useTransactionsStore();
 const categoriesStore = useCategoriesStore();
 
 const filter = ref("all");
 
-const displayTransactions = computed(() =>
-	transactionsStore.ordered.map((tx) => {
-		const catName = tx.categoryId ? categoriesStore.byId.get(tx.categoryId)?.name ?? null : null;
-		return toDisplayTransaction(tx, catName);
-	}),
-);
+const incomeTypes = ["INCOME", "TRANSFER_IN"];
+const expenseTypes = ["EXPENSE", "TRANSFER_OUT"];
+
+function isIncome(tx: Transaction) { return incomeTypes.includes(tx.type); }
 
 const filtered = computed(() => {
-	if (filter.value === "income") return displayTransactions.value.filter((t) => t.amount > 0);
-	if (filter.value === "expense") return displayTransactions.value.filter((t) => t.amount < 0);
-	return displayTransactions.value;
+	const txs = transactionsStore.ordered;
+	if (filter.value === "income") return txs.filter(isIncome);
+	if (filter.value === "expense") return txs.filter((t) => expenseTypes.includes(t.type));
+	return txs;
 });
 
-const incomeCount = computed(() => displayTransactions.value.filter((t) => t.amount > 0).length);
-const expenseCount = computed(() => displayTransactions.value.filter((t) => t.amount < 0).length);
-const totalIn = computed(() => displayTransactions.value.filter((t) => t.amount > 0).reduce((s, t) => s + t.amount, 0));
-const totalOut = computed(() => displayTransactions.value.filter((t) => t.amount < 0).reduce((s, t) => s + t.amount, 0));
+const incomeCount = computed(() => transactionsStore.ordered.filter(isIncome).length);
+const expenseCount = computed(() => transactionsStore.ordered.filter((t) => expenseTypes.includes(t.type)).length);
+const totalIn = computed(() => transactionsStore.ordered.filter(isIncome).reduce((s, t) => s + Math.abs(t.amount), 0));
+const totalOut = computed(() => transactionsStore.ordered.filter((t) => expenseTypes.includes(t.type)).reduce((s, t) => s - Math.abs(t.amount), 0));
 </script>
 
 <style scoped>

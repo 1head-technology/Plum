@@ -8,7 +8,7 @@
 			@navigate="route = $event"
 			@logout="handleLogout"
 		/>
-		<main class="app-shell__main">
+		<main class="app-shell__main" v-if="current">
 			<AppTopbar :title="current.title" :eyebrow="current.eyebrow">
 				<template #actions>
 					<div style="display: flex; gap: 8px">
@@ -47,7 +47,7 @@ import { WButton } from "@/components/ui";
 import AppSidebar from "@/components/layout/AppSidebar.vue";
 import AppTopbar from "@/components/layout/AppTopbar.vue";
 import DashboardView from "@/views/DashboardView.vue";
-import AccountsView from "@/views/AccountsView.vue";
+import AccountsView from "@/views/accounts/AccountsView.vue";
 import TransactionsView from "@/views/TransactionsView.vue";
 import BudgetsView from "@/views/BudgetsView.vue";
 import GoalsView from "@/views/GoalsView.vue";

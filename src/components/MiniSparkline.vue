@@ -1,7 +1,21 @@
 <template>
-	<svg :viewBox="`0 0 ${W} ${H}`" width="100%" :height="H" preserveAspectRatio="none" style="display: block">
-		<path :d="fillPath" fill="var(--wise-mist)" opacity="0.6" />
-		<path :d="linePath" fill="none" stroke="var(--wise)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+	<svg
+		:viewBox="`0 0 ${W} ${H}`"
+		width="100%"
+		:height="H"
+		preserveAspectRatio="none"
+		style="display: block">
+		<path
+			:d="fillPath"
+			fill="var(--wise-mist)"
+			opacity="0.6" />
+		<path
+			:d="linePath"
+			fill="none"
+			stroke="var(--wise)"
+			stroke-width="1.5"
+			stroke-linecap="round"
+			stroke-linejoin="round" />
 	</svg>
 </template>
 

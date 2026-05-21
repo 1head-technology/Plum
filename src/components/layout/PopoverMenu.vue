@@ -2,14 +2,14 @@
 	<Teleport to="body">
 		<Transition name="menu-fade">
 			<div v-if="open" class="menu-backdrop" @click="$emit('close')">
-				<div class="menu" :style="menuPosition" @click.stop>
+				<div ref="menuRef" class="menu" :style="pos" @click.stop>
 					<template v-for="(item, i) in items" :key="item.id ?? `sep-${i}`">
 						<div v-if="item.type === 'separator'" class="menu__divider" />
 						<button
 							v-else
 							class="menu__item"
 							:class="{ 'menu__item--danger': item.type === 'danger' }"
-							@click="handleClick(item)"
+							@click="onItemClick(item)"
 						>
 							<component v-if="item.icon" :is="item.icon" :size="16" class="menu__item-icon" />
 							<span class="menu__item-label">{{ item.label }}</span>
@@ -23,21 +23,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, type Component } from "vue";
+import { ref, watch, nextTick, type CSSProperties } from "vue";
+import { type MenuItem } from "@/data/types.ts";
 
-export interface MenuItem {
-	id?: string;
-	label?: string;
-	icon?: Component;
-	shortcut?: string;
-	type?: "default" | "danger" | "separator";
-}
+const MENU_WIDTH = 220;
+const GAP = 8;
 
 const props = defineProps<{
 	open: boolean;
 	items: MenuItem[];
-	anchorBottom?: number;
-	anchorLeft?: number;
+	anchor?: HTMLElement | null;
 }>();
 
 const emit = defineEmits<{
@@ -45,15 +40,50 @@ const emit = defineEmits<{
 	select: [id: string];
 }>();
 
-const menuPosition = computed(() => ({
-	bottom: `${props.anchorBottom ?? 80}px`,
-	left: `${props.anchorLeft ?? 14}px`,
-}));
+const menuRef = ref<HTMLElement | null>(null);
+const pos = ref<CSSProperties>({});
 
-function handleClick(item: MenuItem) {
+watch(
+	() => props.open,
+	async (isOpen) => {
+		if (!isOpen || !props.anchor) return;
+		await nextTick();
+
+		const anchorRect = props.anchor.getBoundingClientRect();
+		const menuHeight = menuRef.value?.offsetHeight ?? 200;
+		const vw = window.innerWidth;
+		const vh = window.innerHeight;
+
+		const spaceAbove = anchorRect.top;
+		const spaceBelow = vh - anchorRect.bottom;
+		const placeAbove = spaceAbove >= menuHeight + GAP || spaceAbove > spaceBelow;
+
+		let top: number;
+		if (placeAbove) {
+			top = anchorRect.top - menuHeight - GAP;
+			if (top < GAP) top = GAP;
+		}
+		else {
+			top = anchorRect.bottom + GAP;
+			if (top + menuHeight > vh - GAP) top = vh - GAP - menuHeight;
+		}
+
+		let left = anchorRect.left;
+		if (left + MENU_WIDTH > vw - GAP) left = vw - GAP - MENU_WIDTH;
+		if (left < GAP) left = GAP;
+
+		pos.value = {
+			top: `${top}px`,
+			left: `${left}px`,
+		};
+	},
+);
+
+function onItemClick(item: MenuItem) {
 	if (item.id) {
 		emit("select", item.id);
 	}
+
 	emit("close");
 }
 </script>
