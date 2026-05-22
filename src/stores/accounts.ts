@@ -53,6 +53,14 @@ export const useAccountsStore = defineStore("accounts", () => {
 		return created;
 	}
 
+	async function patch(accountId: UUID, payload: Partial<Account>): Promise<Account> {
+		const patched = await accountsApi.patch(accountId, payload);
+
+		accounts.value = accounts.value.map(a => (a.id === accountId ? patched : a));
+
+		return patched;
+	}
+
 	function reset(): void {
 		accounts.value = [];
 		balances.value = {};
@@ -69,6 +77,7 @@ export const useAccountsStore = defineStore("accounts", () => {
 		load,
 		refreshBalance,
 		create,
+		patch,
 		reset,
 	};
 });

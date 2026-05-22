@@ -1,18 +1,12 @@
 <template>
-	<div
-		role="listitem"
-		class="drawer-row"
-		:class="{ 'drawer-row--expanded': expanded }"
-	>
+	<div role="listitem" class="drawer-row" :class="{ 'drawer-row--expanded': expanded }">
 		<!-- primary row -->
 		<div class="drawer-row__primary" @click="onPrimaryClick">
 			<AvatarMark :size="38" />
 
 			<div class="drawer-row__info">
 				<div class="drawer-row__name">{{ account.name }}</div>
-				<div class="drawer-row__meta">
-					{{ account.type }} · {{ account.currency }}
-				</div>
+				<div class="drawer-row__meta">{{ account.type }} · {{ account.currency }}</div>
 			</div>
 
 			<WMoney
@@ -20,27 +14,27 @@
 				:size="14.5"
 				:weight="500"
 				:tone="balance < 0 ? 'loss' : undefined"
-				:currency="account.currency" />
+				:currency="account.currency"
+			/>
 
 			<ChevronDown
 				:size="14"
 				class="drawer-row__chevron"
-				:class="{ 'drawer-row__chevron--open': expanded }" />
+				:class="{ 'drawer-row__chevron--open': expanded }"
+			/>
 		</div>
 
 		<!-- expanded detail -->
 		<div v-if="expanded" class="drawer-row__detail">
-			<WInput
-				v-model:value="editName as string"
-				label="name"
-				size="sm" />
+			<WInput v-model:value="editName as string" label="name" size="sm" />
 			<WSelect
 				v-model:value="editType as AccountType"
 				label="type"
 				:options="accountTypeOptions"
 				value-key="value"
 				label-key="label"
-				size="sm" />
+				size="sm"
+			/>
 			<WSelect
 				v-model:value="editCurrency as string"
 				label="currency"
@@ -49,7 +43,8 @@
 				label-key="code"
 				description-key="name"
 				size="sm"
-				searchable />
+				searchable
+			/>
 		</div>
 	</div>
 </template>
@@ -78,7 +73,9 @@ const accountTypeOptions: { value: AccountType; label: string }[] = [
 	{ value: "CHECKING", label: "Checking" },
 	{ value: "SAVINGS", label: "Savings" },
 	{ value: "CREDIT_CARD", label: "Credit card" },
+	{ value: "CASH", label: "Cash" },
 	{ value: "INVESTMENT", label: "Investment" },
+	{ value: "BANK_ACCOUNT", label: "Bank" },
 ];
 
 // ---- Local edit state ----
@@ -87,13 +84,16 @@ const editType = ref(props.account.type);
 const editCurrency = ref(props.account.currency);
 
 // Sync local state when account prop changes or row is opened
-watch(() => props.expanded, (open) => {
-	if (open) {
-		editName.value = props.account.name;
-		editType.value = props.account.type;
-		editCurrency.value = props.account.currency;
-	}
-});
+watch(
+	() => props.expanded,
+	(open) => {
+		if (open) {
+			editName.value = props.account.name;
+			editType.value = props.account.type;
+			editCurrency.value = props.account.currency;
+		}
+	},
+);
 
 // Emit changes on any edit
 watch(editName, (val) => {

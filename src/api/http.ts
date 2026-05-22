@@ -1,5 +1,6 @@
 import axios, { AxiosError } from "axios";
 import type { ApiError } from "./types";
+import router from "@/router";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080/api/v1";
 
@@ -30,6 +31,7 @@ export class ProstamolError extends Error {
 
 	constructor(status: number, message: string, cause?: unknown) {
 		super(message);
+
 		this.name = "ProstamolError";
 		this.status = status;
 		this.cause = cause;
@@ -39,6 +41,10 @@ export class ProstamolError extends Error {
 http.interceptors.response.use(
 	(response) => response,
 	(error: AxiosError<ApiError>) => {
+		if (error.status === 401) {
+			router.replace("/login");
+		}
+
 		if (error.response?.data && typeof error.response.data === "object") {
 			const data = error.response.data;
 			throw new ProstamolError(

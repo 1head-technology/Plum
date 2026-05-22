@@ -20,8 +20,10 @@
 				<header class="drawer__header">
 					<div class="drawer__header-top">
 						<div>
-							<WEyebrow>manage {{ groupLabel.toLowerCase() }}</WEyebrow>
-							<h2 class="drawer__title">
+							<WEyebrow v-if="groupLabel">
+								manage {{ groupLabel.toLowerCase() }}
+							</WEyebrow>
+							<h2 class="drawer__title" v-if="groupEyebrow">
 								{{ groupEyebrow.charAt(0).toUpperCase() + groupEyebrow.slice(1) }}
 							</h2>
 							<div class="drawer__subtitle">
@@ -76,22 +78,22 @@
 
 					<div v-else role="list">
 						<ManageDrawerRow
-							v-for="a in filteredAccounts"
-							:key="a.id"
-							:account="a"
-							:balance="balanceFor(a)"
-							:expanded="expandedId === a.id"
-							@toggle-expand="expandedId = expandedId === a.id ? null : a.id"
-							@update="(patch) => onUpdateAccount(a, patch)"
+							v-for="account in filteredAccounts"
+							:key="account.id"
+							:account="account"
+							:balance="balanceFor(account)"
+							:expanded="expandedId === account.id"
+							@toggle-expand="
+								expandedId = expandedId === account.id ? null : account.id
+							"
+							@update="(patch) => onUpdateLocalAccount(account, patch)"
 						/>
 					</div>
 				</div>
 
 				<!-- FOOTER -->
 				<footer class="drawer__footer">
-					<button type="button" class="drawer__footer-done" @click="$emit('close')">
-						done
-					</button>
+					<WButton type="button" variant="dark" @click="onPatchAccounts"> done </WButton>
 				</footer>
 			</div>
 		</div>
@@ -100,7 +102,7 @@
 
 <script setup lang="ts">
 import { computed, ref, watch, onBeforeUnmount } from "vue";
-import { WEyebrow, WInput } from "@/components/ui";
+import { WButton, WEyebrow, WInput } from "@/components/ui";
 import ManageDrawerRow from "@/components/accounts/ManageDrawerRow.vue";
 import { useScrollLock } from "@/composables/useScrollLock";
 import type { Account, AccountBalance, UUID } from "@/api";
@@ -123,6 +125,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
 	close: [];
+	patch: [accounts: Account[]];
 }>();
 
 // ---- State ----
@@ -145,8 +148,7 @@ watch(
 			requestAnimationFrame(() => {
 				entered.value = true;
 			});
-		}
-		else {
+		} else {
 			entered.value = false;
 			unlockScroll();
 		}
@@ -161,8 +163,7 @@ function onKeydown(e: KeyboardEvent) {
 
 	if (expandedId.value != null) {
 		expandedId.value = null;
-	}
-	else {
+	} else {
 		emit("close");
 	}
 }
@@ -191,7 +192,9 @@ const filteredAccounts = computed(() => {
 	}
 
 	return accounts.value.filter(
-		(a) => a.name.toLowerCase().includes(filterQuery) || a.type.toLowerCase().includes(filterQuery),
+		(a) =>
+			a.name.toLowerCase().includes(filterQuery) ||
+			a.type.toLowerCase().includes(filterQuery),
 	);
 });
 
@@ -200,8 +203,13 @@ function balanceFor(account: Account): number {
 }
 
 // ---- Update handler ----
-function onUpdateAccount(account: Account, patch: Partial<Account>) {
+function onUpdateLocalAccount(account: Account, patch: Partial<Account>) {
 	accounts.value = accounts.value.map((a) => (a.id === account.id ? { ...a, ...patch } : a));
+}
+
+function onPatchAccounts() {
+	emit("patch", accounts.value);
+	emit("close");
 }
 </script>
 

@@ -45,7 +45,7 @@ const eyebrow = toRef(props, "eyebrow");
 const accounts = toRef(props, "accounts");
 const balances = toRef(props, "balances");
 
-const accountBalanceAmount = (account) => {
+const accountBalanceAmount = (account: Account) => {
 	return balances.value[account.id]?.balance ?? account.initialBalance;
 };
 </script>

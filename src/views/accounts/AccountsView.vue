@@ -51,6 +51,7 @@
 		:group-eyebrow="manageDrawer.eyebrow"
 		:initial-accounts="manageDrawer.accounts"
 		:balances="accountsStore.balances"
+		@patch="onPatchAccounts"
 		@close="isManageDrawerOpen = false"
 	/>
 
@@ -128,14 +129,17 @@ const typeLabels: Record<AccountType, string> = {
 
 const accountsByType = computed(() => {
 	const groups = new Map<AccountType, Account[]>();
+
 	for (const account of accountsStore.accounts) {
 		const existing = groups.get(account.type);
+
 		if (existing) {
 			existing.push(account);
 		} else {
 			groups.set(account.type, [account]);
 		}
 	}
+
 	return [...groups.entries()].map(([type, accounts]) => ({ type, accounts }));
 });
 
@@ -185,8 +189,21 @@ async function onCreateNewAccount() {
 		currency: newAccount.currency,
 		initialBalance: newAccount.initialBalance,
 	};
+
 	await accountsStore.create(payload);
+
 	isAddAccountModalOpen.value = false;
+}
+
+function onPatchAccounts(accounts: Account[]) {
+	for (const account of accounts) {
+		accountsStore.patch(account.id, {
+			name: account.name,
+			type: account.type,
+			currency: account.currency,
+			initialBalance: account.initialBalance,
+		});
+	}
 }
 
 function currentViewAddEntity() {

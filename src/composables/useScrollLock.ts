@@ -10,6 +10,46 @@ interface LockEntry {
 
 const lockRegistry = new Map<Element, LockEntry>();
 
+export function useScrollLock(options: { target?: Element; autoLock?: boolean } = {}) {
+	const {
+		target = document.documentElement,
+		autoLock = false
+	} = options;
+
+	const locked = ref(false);
+
+	function lock() {
+		if (locked.value) {
+			return;
+		}
+		acquireLock(target);
+		locked.value = true;
+	}
+
+	function unlock() {
+		if (!locked.value) {
+			return;
+		}
+
+		releaseLock(target);
+		locked.value = false;
+	}
+
+	if (autoLock) {
+		lock();
+	}
+
+	onScopeDispose(() => {
+		unlock();
+	});
+
+	return {
+		locked,
+		lock,
+		unlock
+	};
+}
+
 function acquireLock(target: Element) {
 	const existing = lockRegistry.get(target);
 	if (existing) {
@@ -41,40 +81,18 @@ function acquireLock(target: Element) {
 
 function releaseLock(target: Element) {
 	const entry = lockRegistry.get(target);
-	if (!entry) return;
+	if (!entry) {
+		return;
+	}
 
 	entry.count--;
-	if (entry.count > 0) return;
+	if (entry.count > 0) {
+		return;
+	}
 
 	const el = target as HTMLElement;
 	el.style.overflow = entry.original.overflow;
 	el.style.paddingRight = entry.original.paddingRight;
 
 	lockRegistry.delete(target);
-}
-
-export function useScrollLock(options: { target?: Element; autoLock?: boolean } = {}) {
-	const { target = document.documentElement, autoLock = false } = options;
-
-	const locked = ref(false);
-
-	function lock() {
-		if (locked.value) return;
-		acquireLock(target);
-		locked.value = true;
-	}
-
-	function unlock() {
-		if (!locked.value) return;
-		releaseLock(target);
-		locked.value = false;
-	}
-
-	if (autoLock) lock();
-
-	onScopeDispose(() => {
-		unlock();
-	});
-
-	return { locked, lock, unlock };
 }

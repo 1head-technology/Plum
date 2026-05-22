@@ -28,15 +28,17 @@ const tone = toRef(props, "tone");
 const size = toRef(props, "size");
 const weight = toRef(props, "weight");
 
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-	style: "currency",
-	currency: currency.value,
-});
-
 // Computed
 const isNeg = computed(() => value.value < 0);
 
-const formatted = computed(() => currencyFormatter.format(value.value));
+const currencyFormatter = computed(() =>
+	new Intl.NumberFormat("en-US", {
+		style: "currency",
+		currency: currency.value,
+	}),
+);
+
+const formatted = computed(() => currencyFormatter.value.format(value.value));
 
 const sign = computed(() => {
 	if (signed.value) {
