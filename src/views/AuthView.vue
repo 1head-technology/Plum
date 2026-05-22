@@ -32,22 +32,14 @@
 			</p>
 
 			<!-- Tab switcher -->
-			<div class="auth-tabs">
-				<button
-					class="auth-tab"
-					:class="{ 'auth-tab--active': mode === 'login' }"
-					@click="switchMode('login')"
-				>
-					sign in
-				</button>
-				<button
-					class="auth-tab"
-					:class="{ 'auth-tab--active': mode === 'signup' }"
-					@click="switchMode('signup')"
-				>
-					create account
-				</button>
-			</div>
+			<WSegment
+				:value="mode"
+				class="auth-tabs"
+				@update:value="switchMode($event as 'login' | 'signup')"
+			>
+				<WSegmentButton value="login">sign in</WSegmentButton>
+				<WSegmentButton value="signup">create account</WSegmentButton>
+			</WSegment>
 
 			<form @submit.prevent="handleSubmit" class="auth-form">
 				<!-- Name (signup only) -->
@@ -160,7 +152,7 @@
 import { reactive, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useSessionStore } from "@/stores/session";
-import { NaruMark, WEyebrow, WInput, AvatarMark } from "@/components/ui";
+import { NaruMark, WEyebrow, WInput, AvatarMark, WSegment, WSegmentButton } from "@/components/ui";
 import { KeyRound } from "lucide-vue-next";
 
 const router = useRouter();
@@ -269,29 +261,7 @@ async function handleSubmit() {
 
 /* ---- Tabs ---- */
 .auth-tabs {
-	display: flex;
-	background: var(--stone-100);
-	border-radius: 999px;
-	padding: 4px;
-	gap: 4px;
 	margin-bottom: 28px;
-}
-.auth-tab {
-	padding: 8px 20px;
-	border: none;
-	border-radius: 999px;
-	background: transparent;
-	color: var(--fg-3);
-	font-size: 13px;
-	font-weight: 500;
-	font-family: var(--font-sans);
-	cursor: pointer;
-	transition: all 120ms var(--ease-out);
-}
-.auth-tab--active {
-	background: var(--paper-warm);
-	color: var(--ink);
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 /* ---- Form ---- */

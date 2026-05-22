@@ -4,6 +4,8 @@
 export type UUID = string;
 export type ISODate = string; // YYYY-MM-DD
 
+// Types enums
+
 export type AccountType =
 	| "CHECKING"
 	| "SAVINGS"
@@ -29,6 +31,8 @@ export type CategoryType = "INCOME" | "EXPENSE";
 export type BudgetStatus = "ACTIVE" | "CLOSED";
 
 export type SavingsGoalStatus = "ACTIVE" | "ACHIEVED" | "CANCELLED";
+
+// Entity interfaces
 
 export interface User {
 	id: UUID;
@@ -118,7 +122,7 @@ export interface SavingsGoal {
 	status: SavingsGoalStatus;
 }
 
-// ---------- Request payloads ----------
+// Requests interfaces
 
 export interface SignupRequest {
 	name: string;
@@ -195,7 +199,7 @@ export interface AddContributionRequest {
 	currency: string;
 }
 
-// ---------- Error envelope ----------
+// Error interface
 
 export interface ApiError {
 	status: number;

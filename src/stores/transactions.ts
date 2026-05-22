@@ -30,13 +30,17 @@ export const useTransactionsStore = defineStore("transactions", () => {
 
 	async function record(payload: RecordTransactionRequest): Promise<Transaction> {
 		const created = await transactionsApi.record(payload);
+
 		transactions.value = [created, ...transactions.value];
+
 		return created;
 	}
 
 	async function recordTransfer(payload: RecordTransferRequest): Promise<Transaction[]> {
 		const created = await transactionsApi.recordTransfer(payload);
+
 		transactions.value = [...created, ...transactions.value];
+
 		return created;
 	}
 
