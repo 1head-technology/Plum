@@ -28,6 +28,7 @@
 				:accounts="group.accounts"
 				:balances="accountsStore.balances"
 				@manage="openManageDrawer(group.type)"
+				@edit="onEditAccount"
 			/>
 
 			<!-- Link account CTA -->
@@ -50,6 +51,7 @@
 		:group-label="manageDrawer.label"
 		:group-eyebrow="manageDrawer.eyebrow"
 		:initial-accounts="manageDrawer.accounts"
+		:initial-expanded-id="manageDrawer.expandedId"
 		:balances="accountsStore.balances"
 		@patch="onPatchAccounts"
 		@close="isManageDrawerOpen = false"
@@ -118,6 +120,7 @@ defineExpose({ currentViewAddEntity });
 const sessionStore = useSessionStore();
 const accountsStore = useAccountsStore();
 
+// Const
 const typeLabels: Record<AccountType, string> = {
 	CHECKING: "Checking",
 	SAVINGS: "Savings",
@@ -126,7 +129,33 @@ const typeLabels: Record<AccountType, string> = {
 	INVESTMENT: "Investments",
 	BANK_ACCOUNT: "Bank accounts",
 };
+const currencies = currencyList;
+const accountTypes: { value: AccountType; label: string }[] = [
+	{ value: "CHECKING", label: "Checking" },
+	{ value: "SAVINGS", label: "Savings" },
+	{ value: "CREDIT_CARD", label: "Credit card" },
+	{ value: "CASH", label: "Cash" },
+	{ value: "INVESTMENT", label: "Investment" },
+	{ value: "BANK_ACCOUNT", label: "Bank account" },
+];
 
+// Refs
+const isManageDrawerOpen = ref(false);
+const isAddAccountModalOpen = ref(false);
+const manageDrawer = reactive({
+	accounts: [] as Account[],
+	label: "",
+	eyebrow: "",
+	expandedId: null as string | null,
+});
+const newAccount = reactive({
+	name: "" as string,
+	type: "" as AccountType,
+	currency: sessionStore.user?.defaultCurrency ?? ("EUR" as string),
+	initialBalance: 0 as number,
+});
+
+// Computed
 const accountsByType = computed(() => {
 	const groups = new Map<AccountType, Account[]>();
 
@@ -143,45 +172,7 @@ const accountsByType = computed(() => {
 	return [...groups.entries()].map(([type, accounts]) => ({ type, accounts }));
 });
 
-function sumBalance(accounts: Account[]) {
-	return accounts.reduce((s, a) => {
-		const bal = accountsStore.balances[a.id];
-		return s + (bal ? bal.balance : a.initialBalance);
-	}, 0);
-}
-
-// ---- Manage drawer ----
-const isManageDrawerOpen = ref(false);
-const manageDrawer = reactive({
-	accounts: [] as Account[],
-	label: "",
-	eyebrow: "",
-});
-
-function openManageDrawer(type: AccountType) {
-	manageDrawer.label = typeLabels[type];
-	manageDrawer.eyebrow = type.toLowerCase().replace(/_/g, " ");
-	manageDrawer.accounts = accountsStore.accounts.filter((a) => a.type === type);
-	isManageDrawerOpen.value = true;
-}
-
-// ---- Add account modal ----
-const isAddAccountModalOpen = ref(false);
-const currencies = currencyList;
-const accountTypes = [
-	{ value: "CHECKING", label: "Checking" },
-	{ value: "SAVINGS", label: "Savings" },
-	{ value: "CREDIT_CARD", label: "Credit card" },
-	{ value: "INVESTMENT", label: "Investment" },
-];
-
-const newAccount = reactive({
-	name: "",
-	type: "" as AccountType,
-	currency: sessionStore.user?.defaultCurrency ?? "EUR",
-	initialBalance: 0,
-});
-
+// Functions
 async function onCreateNewAccount() {
 	const payload: CreateAccountRequest = {
 		name: newAccount.name,
@@ -193,6 +184,7 @@ async function onCreateNewAccount() {
 	await accountsStore.create(payload);
 
 	isAddAccountModalOpen.value = false;
+	clearForm();
 }
 
 function onPatchAccounts(accounts: Account[]) {
@@ -204,6 +196,32 @@ function onPatchAccounts(accounts: Account[]) {
 			initialBalance: account.initialBalance,
 		});
 	}
+}
+
+function clearForm() {
+	newAccount.name = "" as string;
+	newAccount.type = "" as AccountType;
+	newAccount.currency = sessionStore.user?.defaultCurrency ?? ("EUR" as string);
+	newAccount.initialBalance = 0 as number;
+}
+
+function sumBalance(accounts: Account[]) {
+	return accounts.reduce((s, a) => {
+		const bal = accountsStore.balances[a.id];
+		return s + (bal ? bal.balance : a.initialBalance);
+	}, 0);
+}
+
+function openManageDrawer(type: AccountType, expandedId: string | null = null) {
+	manageDrawer.label = typeLabels[type];
+	manageDrawer.eyebrow = type.toLowerCase().replace(/_/g, " ");
+	manageDrawer.accounts = accountsStore.accounts.filter((a) => a.type === type);
+	manageDrawer.expandedId = expandedId;
+	isManageDrawerOpen.value = true;
+}
+
+function onEditAccount(account: Account) {
+	openManageDrawer(account.type, account.id);
 }
 
 function currentViewAddEntity() {

@@ -113,12 +113,14 @@ const props = withDefaults(
 		groupLabel?: string;
 		groupEyebrow?: string;
 		initialAccounts?: Account[];
+		initialExpandedId?: UUID | null;
 		balances?: Record<UUID, AccountBalance>;
 	}>(),
 	{
 		groupLabel: "Cash",
 		groupEyebrow: "checking & savings",
 		initialAccounts: () => [],
+		initialExpandedId: null,
 		balances: () => ({}),
 	},
 );
@@ -142,7 +144,7 @@ watch(
 	(open) => {
 		if (open) {
 			accounts.value = props.initialAccounts.map((a) => ({ ...a }));
-			expandedId.value = null;
+			expandedId.value = props.initialExpandedId ?? null;
 			filter.value = "";
 			lockScroll();
 			requestAnimationFrame(() => {

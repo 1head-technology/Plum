@@ -57,7 +57,8 @@
 					<TransactionRow
 						v-for="tx in filtered"
 						:key="tx.id"
-						:tx="tx"
+						:transaction="tx"
+						:account-name="transactionAccount(tx.accountId)"
 						:category-name="
 							tx.categoryId ? categoriesStore.byId.get(tx.categoryId)?.name : null
 						"
@@ -120,7 +121,39 @@
 			</div>
 		</template>
 
-		<template v-if="selectedTransactionType === 'transfer'"></template>
+		<template v-if="selectedTransactionType === 'transfer'">
+			<div class="new-transaction-modal__form-row flex gap-2">
+				<div class="flex-1">
+					<WSelect
+						v-model:value="newTransfer.sourceAccountId"
+						:options="sourceAccountOptions"
+					/>
+				</div>
+				<div class="flex-1">
+					<WSelect
+						v-model:value="newTransfer.destinationAccountId"
+						:options="destinationAccountOptions"
+					/>
+				</div>
+			</div>
+			<div class="new-transaction-modal__form-row flex gap-2">
+				<div class="w-30">
+					<WSelect
+						v-model:value="newTransfer.currency"
+						:options="currencies"
+						value-key="code"
+						label-key="code"
+						searchable
+					/>
+				</div>
+				<div class="w-70">
+					<WInput v-model:value="newTransfer.amount" type="number" placeholder="0.00" />
+				</div>
+			</div>
+			<div class="new-transaction-modal__form-row">
+				<WInput v-model:value="newTransfer.description" placeholder="description" />
+			</div>
+		</template>
 
 		<template #footer>
 			<WButton @click="isAddTransactionModal = false" variant="ghost">Cancel</WButton>
@@ -205,6 +238,7 @@ const expenseTypes = ["EXPENSE", "TRANSFER_OUT"];
 
 // Computed
 const accounts = computed(() => accountsStore.accounts);
+
 const categories = computed(() => categoriesStore.categories);
 
 const accountOptions = computed<SelectOption[]>(() =>
@@ -213,6 +247,18 @@ const accountOptions = computed<SelectOption[]>(() =>
 
 const categoryOptions = computed<SelectOption[]>(() =>
 	categories.value.map((c) => ({ value: c.id, label: c.name })),
+);
+
+const sourceAccountOptions = computed<SelectOption[]>(() =>
+	accounts.value
+		.map((a) => ({ value: a.id, label: a.name }))
+		.filter((a) => a.value !== newTransfer.destinationAccountId),
+);
+
+const destinationAccountOptions = computed<SelectOption[]>(() =>
+	accounts.value
+		.map((a) => ({ value: a.id, label: a.name }))
+		.filter((a) => a.value !== newTransfer.sourceAccountId),
 );
 
 const filtered = computed(() => {
@@ -244,18 +290,18 @@ const canRecordTransaction = computed(() => {
 		return (
 			newTransaction.accountId &&
 			newTransaction.type &&
-			newTransaction.amount &&
+			newTransaction.amount > 0 &&
+			newTransaction.currency &&
 			newTransaction.date &&
-			newTransaction.description
+			newTransaction.categoryId
 		);
 	} else if (selectedTransactionType.value === "transfer") {
 		return (
 			newTransfer.sourceAccountId &&
 			newTransfer.destinationAccountId &&
-			newTransfer.amount &&
+			newTransfer.amount > 0 &&
 			newTransfer.currency &&
-			newTransfer.date &&
-			newTransfer.description
+			newTransfer.date
 		);
 	}
 
@@ -273,6 +319,15 @@ async function onCreateNewTransaction() {
 
 		await transactionsStore.recordTransfer(payload);
 	}
+
+	clearForms();
+	isAddTransactionModal.value = false;
+}
+
+function transactionAccount(accountId: UUID) {
+	const account = accounts.value.find((a) => a.id === accountId);
+
+	return account ? account.name : "Unknown";
 }
 
 function currentViewAddEntity() {
@@ -281,6 +336,24 @@ function currentViewAddEntity() {
 
 function isIncome(tx: Transaction) {
 	return incomeTypes.includes(tx.type);
+}
+
+function clearForms() {
+	newTransaction.accountId = "" as UUID;
+	newTransaction.type = "EXPENSE" as TransactionType;
+	newTransaction.amount = 0 as number;
+	newTransaction.currency = sessionStore.user?.defaultCurrency ?? ("EUR" as string);
+	newTransaction.date = new Date().toISOString() as ISODate;
+	newTransaction.description = "" as string;
+	newTransaction.categoryId = "" as UUID;
+	newTransaction.recurring = false;
+
+	newTransfer.sourceAccountId = "" as UUID;
+	newTransfer.destinationAccountId = "" as UUID;
+	newTransfer.amount = 0 as number;
+	newTransfer.currency = sessionStore.user?.defaultCurrency ?? ("EUR" as string);
+	newTransfer.date = new Date().toISOString() as ISODate;
+	newTransfer.description = "" as string;
 }
 </script>
 

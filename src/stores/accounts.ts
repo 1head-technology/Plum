@@ -61,6 +61,14 @@ export const useAccountsStore = defineStore("accounts", () => {
 		return patched;
 	}
 
+	async function remove(accountId: UUID): Promise<void> {
+		await accountsApi.delete(accountId);
+
+		accounts.value = accounts.value.filter(a => a.id !== accountId);
+		const { [accountId]: _removed, ...rest } = balances.value;
+		balances.value = rest;
+	}
+
 	function reset(): void {
 		accounts.value = [];
 		balances.value = {};
@@ -78,6 +86,7 @@ export const useAccountsStore = defineStore("accounts", () => {
 		refreshBalance,
 		create,
 		patch,
+		remove,
 		reset,
 	};
 });

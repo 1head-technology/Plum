@@ -23,14 +23,11 @@ const props = withDefaults(
 
 const value = toRef(props, "value");
 const currency = toRef(props, "currency");
-const signed = toRef(props, "signed");
 const tone = toRef(props, "tone");
 const size = toRef(props, "size");
 const weight = toRef(props, "weight");
 
 // Computed
-const isNeg = computed(() => value.value < 0);
-
 const currencyFormatter = computed(() =>
 	new Intl.NumberFormat("en-US", {
 		style: "currency",
@@ -40,15 +37,7 @@ const currencyFormatter = computed(() =>
 
 const formatted = computed(() => currencyFormatter.value.format(value.value));
 
-const sign = computed(() => {
-	if (signed.value) {
-		return isNeg.value ? "− " : "+ ";
-	}
-
-	return isNeg.value ? "− " : "";
-});
-
-const display = computed(() => `${sign.value}${formatted.value}`);
+const display = computed(() => `${formatted.value}`);
 
 const toneClass = computed(() => (tone.value ? `w-money--${tone.value}` : ""));
 

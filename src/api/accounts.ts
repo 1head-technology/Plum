@@ -36,5 +36,9 @@ export const accountsApi = {
 		const { data } = await http.put<Account>(`/accounts/${accountId}`, payload);
 
 		return data;
+	},
+
+	async delete(accountId: UUID): Promise<void> {
+		await http.delete(`/accounts/${accountId}`);
 	}
 };
