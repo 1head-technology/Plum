@@ -73,7 +73,9 @@ export const useAccountsStore = defineStore("accounts", () => {
 
 		// Remove transactions associated with the account
 		const transactionStore = useTransactionsStore();
-		transactionStore.transactions.filter((t) => t.accountId !== accountId);
+		transactionStore.transactions = transactionStore.transactions.filter(
+			(t) => t.accountId !== accountId,
+		);
 	}
 
 	function reset(): void {

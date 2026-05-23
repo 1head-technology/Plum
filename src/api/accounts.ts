@@ -5,8 +5,6 @@ import type {
 	CreateAccountRequest,
 	UUID,
 } from "./types";
-import { useAccountsStore } from "@/stores/accounts.ts";
-import { useTransactionsStore } from "@/stores/transactions.ts";
 
 export const accountsApi = {
 	async create(payload: CreateAccountRequest): Promise<Account> {
@@ -42,9 +40,5 @@ export const accountsApi = {
 
 	async delete(accountId: UUID): Promise<void> {
 		await http.delete(`/accounts/${accountId}`);
-
-		// Remove transactions associated with the account
-		const transactionStore = useTransactionsStore();
-		transactionStore.transactions = transactionStore.transactions.filter(t => t.accountId !== accountId);
 	}
 };
