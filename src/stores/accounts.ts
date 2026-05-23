@@ -7,6 +7,7 @@ import {
 	type CreateAccountRequest,
 	type UUID,
 } from "@/api";
+import { useTransactionsStore } from "@/stores/transactions.ts";
 
 export const useAccountsStore = defineStore("accounts", () => {
 	const accounts = ref<Account[]>([]);
@@ -65,8 +66,14 @@ export const useAccountsStore = defineStore("accounts", () => {
 		await accountsApi.delete(accountId);
 
 		accounts.value = accounts.value.filter(a => a.id !== accountId);
+
+		// Recalculate total balance
 		const { [accountId]: _removed, ...rest } = balances.value;
 		balances.value = rest;
+
+		// Remove transactions associated with the account
+		const transactionStore = useTransactionsStore();
+		transactionStore.transactions.filter((t) => t.accountId !== accountId);
 	}
 
 	function reset(): void {

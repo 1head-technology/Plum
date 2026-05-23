@@ -5,6 +5,7 @@ import {
 	type RecordTransactionRequest,
 	type RecordTransferRequest,
 	type Transaction,
+	type UUID,
 } from "@/api";
 
 export const useTransactionsStore = defineStore("transactions", () => {
@@ -44,6 +45,11 @@ export const useTransactionsStore = defineStore("transactions", () => {
 		return created;
 	}
 
+	async function remove(transactionId: UUID): Promise<void> {
+		await transactionsApi.delete(transactionId);
+		transactions.value = transactions.value.filter((t) => t.id !== transactionId);
+	}
+
 	function reset(): void {
 		transactions.value = [];
 		error.value = null;
@@ -57,6 +63,7 @@ export const useTransactionsStore = defineStore("transactions", () => {
 		load,
 		record,
 		recordTransfer,
+		remove,
 		reset,
 	};
 });

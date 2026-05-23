@@ -55,12 +55,12 @@
 				<SectionHeader eyebrow="activity" title="All transactions" />
 				<div>
 					<TransactionRow
-						v-for="tx in filtered"
-						:key="tx.id"
-						:transaction="tx"
-						:account-name="transactionAccount(tx.accountId)"
+						v-for="transaction in filtered"
+						:key="transaction.id"
+						:transaction="transaction"
+						:account-name="transactionAccount(transaction.accountId)"
 						:category-name="
-							tx.categoryId ? categoriesStore.byId.get(tx.categoryId)?.name : null
+							transaction.categoryId ? categoriesStore.byId.get(transaction.categoryId)?.name : null
 						"
 					/>
 				</div>

@@ -135,10 +135,10 @@
 			</SectionHeader>
 			<div>
 				<TransactionRow
-					v-for="tx in transactionsStore.ordered.slice(0, 6)"
-					:key="tx.id"
-					:category-name="tx.categoryId ? categoriesStore.byId.get(tx.categoryId)?.name : null"
-					:transaction="tx"
+					v-for="transaction in transactionsStore.ordered.slice(0, 6)"
+					:key="transaction.id"
+					:category-name="transaction.categoryId ? categoriesStore.byId.get(transaction.categoryId)?.name : null"
+					:transaction="transaction"
 				/>
 			</div>
 		</WCard>
