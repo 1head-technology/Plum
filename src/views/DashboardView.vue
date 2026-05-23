@@ -138,7 +138,7 @@
 					v-for="tx in transactionsStore.ordered.slice(0, 6)"
 					:key="tx.id"
 					:category-name="tx.categoryId ? categoriesStore.byId.get(tx.categoryId)?.name : null"
-					:tx="tx"
+					:transaction="tx"
 				/>
 			</div>
 		</WCard>

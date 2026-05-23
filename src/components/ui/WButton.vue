@@ -17,7 +17,7 @@ import * as icons from "lucide-vue-next";
 
 const props = withDefaults(
 	defineProps<{
-		variant?: "primary" | "ghost" | "dark" | "text" | "accent";
+		variant?: "primary" | "ghost" | "dark" | "text" | "accent" | "loss";
 		size?: "sm" | "md" | "lg";
 		icon?: string;
 		type?: "button" | "submit" | "reset";
@@ -121,5 +121,13 @@ const iconComponent = computed(() => {
 }
 .w-btn--accent:hover:not(:disabled) {
 	background: var(--wise-mist);
+}
+
+.w-btn--loss {
+	background: var(--loss);
+	color: var(--paper-warm);
+}
+.w-btn--loss:hover:not(:disabled) {
+	background: color-mix(in srgb, var(--loss) 85%, black);
 }
 </style>
