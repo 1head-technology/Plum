@@ -342,7 +342,7 @@ function navigateList(e: KeyboardEvent) {
 		case "Enter":
 			e.preventDefault();
 			if (highlightedIndex.value >= 0) {
-				select(filteredOptions.value[highlightedIndex.value]);
+				select(filteredOptions.value[highlightedIndex.value] as SelectOption);
 			}
 			break;
 		case "Escape":

@@ -45,6 +45,14 @@ export const useTransactionsStore = defineStore("transactions", () => {
 		return created;
 	}
 
+	async function patch(transactionId: UUID, payload: Partial<Transaction>,): Promise<Transaction> {
+		const patched = await transactionsApi.patch(transactionId, payload);
+
+		transactions.value = transactions.value.map((t) => (t.id === transactionId ? patched : t));
+
+		return patched;
+	}
+
 	async function remove(transactionId: UUID): Promise<void> {
 		await transactionsApi.delete(transactionId);
 		transactions.value = transactions.value.filter((t) => t.id !== transactionId);

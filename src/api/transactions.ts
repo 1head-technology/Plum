@@ -51,6 +51,11 @@ export const transactionsApi = {
 		return data;
 	},
 
+	async patch(transactionId: UUID, payload: Partial<Transaction>): Promise<Transaction> {
+		const { data } = await http.patch<Transaction>(`/transactions/${transactionId}`, payload);
+		return data;
+	},
+
 	async delete(transactionId: UUID): Promise<void> {
 		await http.delete(`/transactions/${transactionId}`);
 

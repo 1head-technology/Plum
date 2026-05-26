@@ -15,7 +15,7 @@
 			:key="item.id"
 			class="nav-item"
 			:class="{ 'nav-item--active': route === item.id }"
-			@click="$emit('navigate', item.id)"
+			@click="$emit('navigate', item?.id ?? 'dashboard')"
 		>
 			<component :is="item.icon" :size="16" class="nav-item__icon" />
 			{{ item.label }}
@@ -29,7 +29,7 @@
 			:key="item.id"
 			class="nav-item"
 			:class="{ 'nav-item--active': route === item.id }"
-			@click="$emit('navigate', item.id)"
+			@click="$emit('navigate', item?.id ?? 'settings')"
 		>
 			<component :is="item.icon" :size="16" class="nav-item__icon" />
 			{{ item.label }}
