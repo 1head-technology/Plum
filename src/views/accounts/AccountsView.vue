@@ -111,7 +111,7 @@ import { WCard, WEyebrow, WMoney, WButton, WModal, WInput, WSelect } from "@/com
 import AccountGroup from "@/components/accounts/AccountGroup.vue";
 import ManageAccountsDrawer from "@/components/accounts/ManageAccountsDrawer.vue";
 import { useAccountsStore } from "@/stores/accounts";
-import { currencyList } from "@/data/utils";
+import { currencyList } from "@/utilities/utilities";
 import { useSessionStore } from "@/stores/session";
 import type { Account, AccountType, CreateAccountRequest } from "@/api";
 

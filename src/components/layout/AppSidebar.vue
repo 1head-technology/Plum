@@ -72,7 +72,7 @@ import {
 	LogOut,
 } from "lucide-vue-next";
 import { NaruMark, WEyebrow, AvatarMark } from "@/components/ui";
-import { type MenuItem } from "@/data/types.ts";
+import { type MenuItem } from "@/utilities/types.ts";
 import PopoverMenu from "./PopoverMenu.vue";
 
 // Props

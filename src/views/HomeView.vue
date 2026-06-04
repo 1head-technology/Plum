@@ -49,7 +49,7 @@ import AppTopbar from "@/components/layout/AppTopbar.vue";
 import DashboardView from "@/views/DashboardView.vue";
 import AccountsView from "@/views/accounts/AccountsView.vue";
 import TransactionsView from "@/views/transactions/TransactionsView.vue";
-import BudgetsView from "@/views/BudgetsView.vue";
+import BudgetsView from "@/views/budgets/BudgetsView.vue";
 import GoalsView from "@/views/GoalsView.vue";
 import PlaceholderView from "@/views/PlaceholderView.vue";
 

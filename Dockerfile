@@ -15,7 +15,7 @@ FROM nginx:stable-alpine as production-stage
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 
 # Custom Nginx config to handle Vue routing
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY server/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expose application
 EXPOSE 80

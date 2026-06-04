@@ -197,7 +197,7 @@ import type {
 } from "@/api";
 import { useSessionStore } from "@/stores/session.ts";
 import { useAccountsStore } from "@/stores/accounts.ts";
-import { currencyList } from "@/data/utils.ts";
+import { currencyList } from "@/utilities/utilities.js";
 
 defineExpose({ currentViewAddEntity });
 

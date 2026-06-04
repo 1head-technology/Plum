@@ -115,11 +115,14 @@
 			</form>
 
 			<!-- Divider -->
+			<!--
 			<div class="auth-divider">
 				<span>or</span>
 			</div>
+			-->
 
 			<!-- Alt sign-in buttons -->
+			<!--
 			<div class="auth-alt-buttons">
 				<button class="auth-alt-btn" @click.prevent>
 					<KeyRound :size="16" />
@@ -130,8 +133,10 @@
 					continue with Google
 				</button>
 			</div>
+			-->
 
 			<!-- Bottom link -->
+			<!--
 			<p class="auth-card__footer">
 				<template v-if="mode === 'login'">
 					new to wise?
@@ -144,6 +149,7 @@
 					<button class="auth-link" @click="switchMode('login')">sign in</button>
 				</template>
 			</p>
+			-->
 		</main>
 	</div>
 </template>

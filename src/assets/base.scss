@@ -1,4 +1,4 @@
-@import "./tokens.scss";
+@use "./tokens";
 
 *,
 *::before,
@@ -16,7 +16,7 @@ body {
 body {
 	min-height: 100vh;
 	color: var(--fg-1);
-	font-family: var(--font-sans);
+	font-family: var(--font-sans) sans-serif;
 	font-size: 15px;
 	line-height: 1.6;
 	text-rendering: optimizeLegibility;

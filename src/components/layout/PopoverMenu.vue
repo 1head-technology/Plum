@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import { ref, watch, nextTick, type CSSProperties } from "vue";
-import { type MenuItem } from "@/data/types.ts";
+import { type MenuItem } from "@/utilities/types.ts";
 
 const MENU_WIDTH = 220;
 const GAP = 8;

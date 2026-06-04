@@ -53,7 +53,7 @@
 import { ref, watch } from "vue";
 import { ChevronDown } from "lucide-vue-next";
 import { AvatarMark, WMoney, WInput, WSelect } from "@/components/ui";
-import { currencyList } from "@/data/utils";
+import { currencyList } from "@/utilities/utilities";
 import type { Account, AccountType } from "@/api";
 
 const props = defineProps<{
