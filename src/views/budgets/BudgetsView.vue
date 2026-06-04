@@ -80,7 +80,7 @@ const lastDayOfTheMonth: Date = new Date(now.getFullYear(), now.getMonth() + 1, 
 
 // refs
 const monthlyBudget: CreateBudgetRequest = reactive({
-	name: thisMonth,
+	name: thisMonth.toString(),
 	from: firstDayOfTheMonth.toISOString(),
 	to: lastDayOfTheMonth.toISOString(),
 	lines: [],
