@@ -116,10 +116,8 @@ const nearCapCount = computed(
 		}).length,
 );
 
-// functions
-async function createMonthlyBudget() {
-	await budgetsStore.create(monthlyBudget);
-}
+
+
 </script>
 
 <style scoped>

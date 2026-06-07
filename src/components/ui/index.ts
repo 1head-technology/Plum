@@ -8,6 +8,7 @@ export { default as WBar } from "./WBar.vue";
 export { default as WChip } from "./WChip.vue";
 export { default as WInput } from "./WInput.vue";
 export { default as WSelect } from "./WSelect.vue";
+export { default as WDatePicker } from "./WDatePicker.vue";
 export { default as AvatarMark } from "./AvatarMark.vue";
 export { default as SectionHeader } from "./SectionHeader.vue";
 export { default as WDonut } from "./WDonut.vue";
