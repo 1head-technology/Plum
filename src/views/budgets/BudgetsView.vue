@@ -42,7 +42,7 @@
 			</div>
 
 			<!-- Categories -->
-			<WCard :padding="24" v-if="budgetLines.length">
+			<WCard v-if="budgetLines.length" :padding="24">
 				<SectionHeader eyebrow="categories" title="By category">
 					<template #action>
 						<WButton variant="ghost" icon="plus" size="sm">New budget</WButton>
@@ -63,7 +63,7 @@
 	</div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { computed, reactive, watch } from "vue";
 import { WCard, WEyebrow, WMoney, WBadge, WButton, WDonut, SectionHeader } from "@/components/ui";
 import BudgetRow from "@/components/budgets/BudgetRow.vue";

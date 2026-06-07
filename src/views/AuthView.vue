@@ -163,6 +163,7 @@ import { KeyRound } from "lucide-vue-next";
 
 const router = useRouter();
 const route = useRoute();
+
 const session = useSessionStore();
 
 const mode = ref<"login" | "signup">(route.name === "signup" ? "signup" : "login");
@@ -183,8 +184,12 @@ function switchMode(to: "login" | "signup") {
 
 async function handleSubmit() {
 	if (mode.value === "login") {
-		await session.login({ email: form.email, password: form.password });
-	} else {
+		await session.login({
+			email: form.email,
+			password: form.password
+		});
+	}
+	else {
 		await session.signup({
 			name: form.name,
 			email: form.email,
@@ -192,6 +197,7 @@ async function handleSubmit() {
 			defaultCurrency: form.defaultCurrency,
 		});
 	}
+
 	await router.push("/");
 }
 </script>

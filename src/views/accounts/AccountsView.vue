@@ -58,66 +58,23 @@
 	/>
 
 	<!-- New Account Modal -->
-	<WModal
+	<CreateAccountModal
 		v-model:is-open="isAddAccountModalOpen"
-		title="Add new account"
-		class="new-account-modal"
-	>
-		<div class="new-account-modal__form-row">
-			<WInput v-model:value="newAccount.name" label="name" placeholder="Checking account" />
-		</div>
-		<div class="new-account-modal__form-row">
-			<WSelect
-				v-model:value="newAccount.type"
-				label="type"
-				placeholder="Account type"
-				:options="accountTypes"
-				value-key="value"
-				label-key="label"
-			/>
-		</div>
-		<div class="new-account-modal__form-row">
-			<WSelect
-				v-model:value="newAccount.currency"
-				label="currency"
-				placeholder="Select currency"
-				:options="currencies"
-				value-key="code"
-				label-key="code"
-				description-key="name"
-				searchable
-			/>
-		</div>
-		<div class="new-account-modal__form-row">
-			<WInput
-				v-model:value="newAccount.initialBalance"
-				label="initial amount"
-				placeholder="0.00"
-				inputmode="decimal"
-				:prefix="newAccount.currency"
-			/>
-		</div>
-
-		<template #footer>
-			<WButton @click="isAddAccountModalOpen = false" variant="ghost">Cancel</WButton>
-			<WButton @click="onCreateNewAccount" variant="primary">Confirm</WButton>
-		</template>
-	</WModal>
+		@submit="onCreateNewAccount"
+	/>
 </template>
 
 <script setup lang="ts">
 import { computed, reactive, ref } from "vue";
-import { WCard, WEyebrow, WMoney, WButton, WModal, WInput, WSelect } from "@/components/ui";
+import { WCard, WEyebrow, WMoney, WButton } from "@/components/ui";
 import AccountGroup from "@/components/accounts/AccountGroup.vue";
 import ManageAccountsDrawer from "@/components/accounts/ManageAccountsDrawer.vue";
+import CreateAccountModal from "@/views/accounts/CreateAccountModal.vue";
 import { useAccountsStore } from "@/stores/accounts";
-import { currencyList } from "@/utilities/utilities";
-import { useSessionStore } from "@/stores/session";
 import type { Account, AccountType, CreateAccountRequest } from "@/api";
 
 defineExpose({ currentViewAddEntity });
 
-const sessionStore = useSessionStore();
 const accountsStore = useAccountsStore();
 
 // Const
@@ -129,15 +86,6 @@ const typeLabels: Record<AccountType, string> = {
 	INVESTMENT: "Investments",
 	BANK_ACCOUNT: "Bank accounts",
 };
-const currencies = currencyList;
-const accountTypes: { value: AccountType; label: string }[] = [
-	{ value: "CHECKING", label: "Checking" },
-	{ value: "SAVINGS", label: "Savings" },
-	{ value: "CREDIT_CARD", label: "Credit card" },
-	{ value: "CASH", label: "Cash" },
-	{ value: "INVESTMENT", label: "Investment" },
-	{ value: "BANK_ACCOUNT", label: "Bank account" },
-];
 
 // Refs
 const isManageDrawerOpen = ref(false);
@@ -147,12 +95,6 @@ const manageDrawer = reactive({
 	label: "",
 	eyebrow: "",
 	expandedId: null as string | null,
-});
-const newAccount = reactive({
-	name: "" as string,
-	type: "" as AccountType,
-	currency: sessionStore.user?.defaultCurrency ?? ("EUR" as string),
-	initialBalance: 0 as number,
 });
 
 // Computed
@@ -173,18 +115,8 @@ const accountsByType = computed(() => {
 });
 
 // Functions
-async function onCreateNewAccount() {
-	const payload: CreateAccountRequest = {
-		name: newAccount.name,
-		type: newAccount.type,
-		currency: newAccount.currency,
-		initialBalance: newAccount.initialBalance,
-	};
-
+async function onCreateNewAccount(payload: CreateAccountRequest) {
 	await accountsStore.create(payload);
-
-	isAddAccountModalOpen.value = false;
-	clearForm();
 }
 
 function onPatchAccounts(accounts: Account[]) {
@@ -196,13 +128,6 @@ function onPatchAccounts(accounts: Account[]) {
 			initialBalance: account.initialBalance,
 		});
 	}
-}
-
-function clearForm() {
-	newAccount.name = "" as string;
-	newAccount.type = "" as AccountType;
-	newAccount.currency = sessionStore.user?.defaultCurrency ?? ("EUR" as string);
-	newAccount.initialBalance = 0 as number;
 }
 
 function sumBalance(accounts: Account[]) {
@@ -258,9 +183,5 @@ function currentViewAddEntity() {
 }
 .error {
 	color: var(--loss);
-}
-
-.new-account-modal__form-row {
-	margin-bottom: 21px;
 }
 </style>
